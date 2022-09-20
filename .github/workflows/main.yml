@@ -1,0 +1,25 @@
+
+name: snyk monitor pipenv
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: install snyk
+        run: |
+            pip install pipenv
+            which python3
+            pipenv install --dev --clear
+            npm -g install snyk@latest
+            snyk auth ${SNYK_TOKEN}
+            snyk monitor --dev --file=Pipfile --command=python --print-deps
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
